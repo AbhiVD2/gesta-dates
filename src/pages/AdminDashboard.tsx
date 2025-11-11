@@ -84,17 +84,44 @@ export default function AdminDashboard() {
     }
   }, [admins]);
 
+  // Ensure patients are fresh when opening the Add Scan dialog
+  useEffect(() => {
+    if (scanOpen) {
+      fetchPatients();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scanOpen]);
+
   const fetchPatients = async () => {
-    const { data } = await supabase
-      .from('profiles')
-      .select(`
-        *,
-        user_roles!inner(role),
-        patient_scans(*)
-      `)
-      .eq('user_roles.role', 'patient');
-    
-    setPatients(data || []);
+    try {
+      // First get the user IDs that have the 'patient' role
+      const { data: rolesData, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('user_id')
+        .eq('role', 'patient');
+
+      if (rolesError) throw rolesError;
+
+      if (!rolesData || rolesData.length === 0) {
+        setPatients([]);
+        return;
+      }
+
+      const userIds = rolesData.map((r: any) => r.user_id);
+
+      // Fetch profiles and their scans for those user IDs
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('*, patient_scans(*)')
+        .in('id', userIds);
+
+      if (profilesError) throw profilesError;
+
+      setPatients(profilesData || []);
+    } catch (error: any) {
+      console.error('Error fetching patients:', error?.message || error);
+      setPatients([]);
+    }
   };
 
   const fetchAdmins = async () => {
@@ -389,6 +416,20 @@ export default function AdminDashboard() {
 
       if (authError) throw authError;
 
+      // In some Supabase setups the signUp flow requires email confirmation and
+      // `authData.user` may be null until the user confirms. Handle that case
+      // gracefully and inform the admin to check the user's email.
+      if (!authData?.user) {
+        toast.success('Sign-up initiated. The user may need to confirm their email before the account is active.');
+        setOpen(false);
+        // clear form
+        setEmail('');
+        setPassword('');
+        setFullName('');
+        setPhone('');
+        return;
+      }
+
       if (authData.user) {
         await supabase.from('profiles').insert({
           id: authData.user.id,
@@ -410,7 +451,9 @@ export default function AdminDashboard() {
         setPhone('');
       }
     } catch (error: any) {
-      toast.error(error.message);
+      const msg = (error && (error.message || error.error_description || error.msg)) || (typeof error === 'string' ? error : JSON.stringify(error));
+      console.error('createPatient error', error);
+      toast.error(String(msg));
     }
   };
 
@@ -432,6 +475,16 @@ export default function AdminDashboard() {
       });
 
       if (authError) throw authError;
+
+      if (!authData?.user) {
+        toast.success('Sign-up initiated. The admin may need to confirm their email before the account is active.');
+        setAdminOpen(false);
+        setAdminEmail('');
+        setAdminPassword('');
+        setAdminName('');
+        setAdminPhone('');
+        return;
+      }
 
       if (authData.user) {
         await supabase.from('profiles').insert({
@@ -460,7 +513,9 @@ export default function AdminDashboard() {
         setAdminPhone('');
       }
     } catch (error: any) {
-      toast.error(error.message);
+      const msg = (error && (error.message || error.error_description || error.msg)) || (typeof error === 'string' ? error : JSON.stringify(error));
+      console.error('createAdmin error', error);
+      toast.error(String(msg));
     }
   };
 
