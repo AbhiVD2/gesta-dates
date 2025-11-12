@@ -52,12 +52,14 @@ export default function Auth() {
 
       if (authData.user) {
         // Create profile
+        // store email on profile as well so we can support phone->email lookup on sign-in
         const { error: profileError } = await supabase
           .from('profiles')
           .insert({
             id: authData.user.id,
             full_name: fullName,
-            phone: phone || null
+            phone: phone || null,
+            email: email || null
           });
 
         if (profileError) throw profileError;
@@ -84,17 +86,41 @@ export default function Auth() {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    // allow either email or phone number as the credential
     if (!email || !password) {
-      toast.error('Please enter email and password');
+      toast.error('Please enter email/phone and password');
       return;
     }
 
     setLoading(true);
 
     try {
+      const credential = email.trim();
+
+      // simple phone detection: starts with + or only digits (7-15 digits)
+      const phoneRegex = /^\+?\d{7,15}$/;
+      let emailToUse = credential;
+
+      if (phoneRegex.test(credential)) {
+        // lookup profile by phone to find associated email
+        const { data: profile, error: profileErr } = await supabase
+          .from('profiles')
+          .select('email')
+          .eq('phone', credential)
+          .maybeSingle();
+
+        if (profileErr) throw profileErr;
+        if (!profile || !profile.email) {
+          toast.error('No account found for that phone number');
+          setLoading(false);
+          return;
+        }
+
+        emailToUse = profile.email;
+      }
+
       const { error } = await supabase.auth.signInWithPassword({
-        email,
+        email: emailToUse,
         password,
       });
 
@@ -129,11 +155,11 @@ export default function Auth() {
             <TabsContent value="signin">
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signin-email">Email</Label>
+                  <Label htmlFor="signin-credential">Email or Phone</Label>
                   <Input
-                    id="signin-email"
-                    type="email"
-                    placeholder="your@email.com"
+                    id="signin-credential"
+                    type="text"
+                    placeholder="email or +1234567890"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required

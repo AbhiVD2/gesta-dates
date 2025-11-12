@@ -434,7 +434,10 @@ export default function AdminDashboard() {
         await supabase.from('profiles').insert({
           id: authData.user.id,
           full_name: fullName,
-          phone: phone || null
+          phone: phone || null,
+          email: email || null,
+          // set created_by to the current admin's user id so admin ownership is tracked
+          created_by: user?.id || null
         });
 
         await supabase.from('user_roles').insert({
