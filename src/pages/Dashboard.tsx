@@ -25,7 +25,7 @@ export default function Dashboard() {
   }
 
   if (userRole === 'admin' || userRole === 'superadmin' || userRole === 'subadmin') {
-    return <AdminDashboard />;
+    return <Navigate to="/admin/dashboard" replace />;
   }
 
   return (
