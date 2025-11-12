@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Mobile-first base styles */
+@layer base {
+  * {
+    @apply touch-manipulation;
+  }
+  
+  html {
+    @apply text-base;
+  }
+  
+  /* Ensure minimum touch targets on mobile */
+  button, a, input, select, textarea {
+    @apply min-h-[44px];
+  }
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */

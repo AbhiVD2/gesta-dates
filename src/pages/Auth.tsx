@@ -136,20 +136,20 @@ export default function Auth() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-accent/20 to-background p-4">
-      <Card className="w-full max-w-md shadow-xl">
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-            <Heart className="h-8 w-8 text-primary" />
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-accent/20 to-background p-3 sm:p-4">
+      <Card className="w-full max-w-md shadow-xl border-2">
+        <CardHeader className="text-center pb-4 sm:pb-6">
+          <div className="mx-auto mb-3 sm:mb-4 flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-primary/10">
+            <Heart className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl">Pregnancy Care Portal</CardTitle>
-          <CardDescription>Manage your pregnancy journey with care</CardDescription>
+          <CardTitle className="text-xl sm:text-2xl">Pregnancy Care Portal</CardTitle>
+          <CardDescription className="text-sm">Manage your pregnancy journey with care</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 sm:px-6">
           <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 h-11 sm:h-12">
+              <TabsTrigger value="signin" className="text-sm sm:text-base">Sign In</TabsTrigger>
+              <TabsTrigger value="signup" className="text-sm sm:text-base">Sign Up</TabsTrigger>
             </TabsList>
             
             <TabsContent value="signin">
