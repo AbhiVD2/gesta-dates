@@ -109,7 +109,10 @@ export default function Auth() {
           .eq('phone', credential)
           .maybeSingle();
 
-        if (profileErr) throw profileErr;
+        if (profileErr) {
+          console.error('Phone lookup error:', profileErr);
+          throw profileErr;
+        }
         if (!profile || !profile.email) {
           toast.error('No account found for that phone number');
           setLoading(false);
@@ -119,18 +122,26 @@ export default function Auth() {
         emailToUse = profile.email;
       }
 
-      const { error } = await supabase.auth.signInWithPassword({
+      console.log('Attempting sign in with email:', emailToUse);
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: emailToUse,
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Sign in error:', error);
+        throw error;
+      }
 
+      console.log('Sign in successful, user:', data.user?.id);
       toast.success('Signed in successfully!');
+      
+      // Wait a moment for session to be fully established before navigating
+      await new Promise(resolve => setTimeout(resolve, 500));
       navigate('/dashboard');
     } catch (error: any) {
+      console.error('Login error:', error);
       toast.error(error.message || 'Failed to sign in');
-    } finally {
       setLoading(false);
     }
   };
