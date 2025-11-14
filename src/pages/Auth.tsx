@@ -52,14 +52,12 @@ export default function Auth() {
 
       if (authData.user) {
         // Create profile
-        // store email on profile as well so we can support phone->email lookup on sign-in
         const { error: profileError } = await supabase
           .from('profiles')
           .insert({
             id: authData.user.id,
             full_name: fullName,
-            phone: phone || null,
-            email: email || null
+            phone: phone || null
           });
 
         if (profileError) throw profileError;
@@ -86,41 +84,17 @@ export default function Auth() {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    // allow either email or phone number as the credential
+    
     if (!email || !password) {
-      toast.error('Please enter email/phone and password');
+      toast.error('Please enter email and password');
       return;
     }
 
     setLoading(true);
 
     try {
-      const credential = email.trim();
-
-      // simple phone detection: starts with + or only digits (7-15 digits)
-      const phoneRegex = /^\+?\d{7,15}$/;
-      let emailToUse = credential;
-
-      if (phoneRegex.test(credential)) {
-        // lookup profile by phone to find associated email
-        const { data: profile, error: profileErr } = await supabase
-          .from('profiles')
-          .select('email')
-          .eq('phone', credential)
-          .maybeSingle();
-
-        if (profileErr) throw profileErr;
-        if (!profile || !profile.email) {
-          toast.error('No account found for that phone number');
-          setLoading(false);
-          return;
-        }
-
-        emailToUse = profile.email;
-      }
-
       const { error } = await supabase.auth.signInWithPassword({
-        email: emailToUse,
+        email,
         password,
       });
 
@@ -136,30 +110,30 @@ export default function Auth() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-accent/20 to-background p-3 sm:p-4">
-      <Card className="w-full max-w-md shadow-xl border-2">
-        <CardHeader className="text-center pb-4 sm:pb-6">
-          <div className="mx-auto mb-3 sm:mb-4 flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-primary/10">
-            <Heart className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-accent/20 to-background p-4">
+      <Card className="w-full max-w-md shadow-xl">
+        <CardHeader className="text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+            <Heart className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-xl sm:text-2xl">Pregnancy Care Portal</CardTitle>
-          <CardDescription className="text-sm">Manage your pregnancy journey with care</CardDescription>
+          <CardTitle className="text-2xl">Pregnancy Care Portal</CardTitle>
+          <CardDescription>Manage your pregnancy journey with care</CardDescription>
         </CardHeader>
-        <CardContent className="px-4 sm:px-6">
+        <CardContent>
           <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 h-11 sm:h-12">
-              <TabsTrigger value="signin" className="text-sm sm:text-base">Sign In</TabsTrigger>
-              <TabsTrigger value="signup" className="text-sm sm:text-base">Sign Up</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="signin">Sign In</TabsTrigger>
+              <TabsTrigger value="signup">Sign Up</TabsTrigger>
             </TabsList>
             
             <TabsContent value="signin">
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signin-credential">Email or Phone</Label>
+                  <Label htmlFor="signin-email">Email</Label>
                   <Input
-                    id="signin-credential"
-                    type="text"
-                    placeholder="email or +1234567890"
+                    id="signin-email"
+                    type="email"
+                    placeholder="your@email.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
