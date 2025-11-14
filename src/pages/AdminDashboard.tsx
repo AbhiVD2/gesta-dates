@@ -597,32 +597,32 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-accent/10 to-background">
-      <header className="border-b bg-card/50 backdrop-blur-sm">
-        <div className="container mx-auto flex items-center justify-between px-4 py-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-              <Users className="h-5 w-5 text-primary" />
+      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-10">
+        <div className="container mx-auto flex items-center justify-between px-3 sm:px-4 py-3 sm:py-4">
+          <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-primary/10 flex-shrink-0">
+              <Users className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             </div>
-            <div>
-              <h1 className="text-xl font-semibold">{userRole === 'superadmin' ? 'Super Admin' : 'Admin'} Dashboard</h1>
-              <p className="text-sm text-muted-foreground">Manage patients and schedules</p>
+            <div className="min-w-0">
+              <h1 className="text-sm sm:text-xl font-semibold truncate">{userRole === 'superadmin' ? 'Super Admin' : 'Admin'} Dashboard</h1>
+              <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">Manage patients and schedules</p>
             </div>
           </div>
-          <Button variant="ghost" size="sm" onClick={signOut}>
-            <LogOut className="mr-2 h-4 w-4" />
-            Sign Out
+          <Button variant="ghost" size="sm" onClick={signOut} className="flex-shrink-0">
+            <LogOut className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Sign Out</span>
           </Button>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 pb-8">
         {/* Admin Management Section - Only for Superadmins */}
         {userRole === 'superadmin' && (
-          <div className="mb-8">
-            <div className="mb-6 flex gap-4">
+          <div className="mb-6 sm:mb-8">
+            <div className="mb-4 sm:mb-6">
               <Dialog open={adminOpen} onOpenChange={setAdminOpen}>
                 <DialogTrigger asChild>
-                  <Button className="bg-teal-600 hover:bg-teal-700">
+                  <Button className="bg-teal-600 hover:bg-teal-700 w-full sm:w-auto">
                     <Plus className="mr-2 h-4 w-4" />
                     Add Admin
                   </Button>
@@ -656,16 +656,16 @@ export default function AdminDashboard() {
             </div>
 
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Shield className="h-5 w-5" />
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                  <Shield className="h-4 w-4 sm:h-5 sm:w-5" />
                   Admin Management
                 </CardTitle>
-                <CardDescription>Manage admins and their status</CardDescription>
+                <CardDescription className="text-sm">Manage admins and their status</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="rounded-lg border overflow-x-auto">
-                  <Table>
+              <CardContent className="p-0 sm:p-6">
+                <div className="rounded-lg border overflow-x-auto -mx-3 sm:mx-0">
+                  <Table className="text-sm">
                     <TableHeader>
                       <TableRow>
                         <TableHead>Name</TableHead>
@@ -680,7 +680,7 @@ export default function AdminDashboard() {
                     <TableBody>
                       {admins.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                          <TableCell colSpan={7} className="text-center text-muted-foreground py-8 text-sm">
                             No admins yet
                           </TableCell>
                         </TableRow>
@@ -690,10 +690,10 @@ export default function AdminDashboard() {
                           const stats = adminStats[admin.id] || { subadmins: 0, patients: 0 };
                           return (
                             <TableRow key={admin.id}>
-                              <TableCell className="font-medium">{admin.full_name}</TableCell>
-                              <TableCell>{admin.phone || '-'}</TableCell>
+                              <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap">{admin.full_name}</TableCell>
+                              <TableCell className="text-xs sm:text-sm whitespace-nowrap">{admin.phone || '-'}</TableCell>
                               <TableCell>
-                                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${
+                                <div className={`inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap ${
                                   isActive 
                                     ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
                                     : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
