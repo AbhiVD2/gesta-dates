@@ -958,7 +958,7 @@ export default function AdminDashboard() {
         )}
         {userRole !== 'superadmin' && (
           <>
-            <Card className="mb-6">
+            <Card className="mb-6 bg-primary/20 border-primary/40">
               <CardHeader>
                 <CardTitle>Patients Schedule</CardTitle>
                 <CardDescription>Upcoming scan schedules (ordered by sequence and EDD)</CardDescription>
