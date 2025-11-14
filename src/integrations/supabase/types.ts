@@ -14,102 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      admin_status: {
-        Row: {
-          created_at: string
-          id: string
-          is_active: boolean
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          is_active?: boolean
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          is_active?: boolean
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      subscriptions: {
-        Row: {
-          admin_id: string
-          auto_renew: boolean
-          created_at: string
-          end_date: string
-          id: string
-          is_active: boolean
-          plan_id: string
-          start_date: string
-          updated_at: string
-        }
-        Insert: {
-          admin_id: string
-          auto_renew?: boolean
-          created_at?: string
-          end_date: string
-          id?: string
-          is_active?: boolean
-          plan_id: string
-          start_date: string
-          updated_at?: string
-        }
-        Update: {
-          admin_id?: string
-          auto_renew?: boolean
-          created_at?: string
-          end_date?: string
-          id?: string
-          is_active?: boolean
-          plan_id?: string
-          start_date?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      subscription_plans: {
-        Row: {
-          created_at: string
-          description: string | null
-          duration_days: number
-          features: string[] | null
-          id: string
-          is_active: boolean
-          name: string
-          price: number
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          duration_days: number
-          features?: string[] | null
-          id?: string
-          is_active?: boolean
-          name: string
-          price: number
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          duration_days?: number
-          features?: string[] | null
-          id?: string
-          is_active?: boolean
-          name?: string
-          price?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
       patient_scans: {
         Row: {
           aua_weeks: number | null
@@ -153,7 +57,6 @@ export type Database = {
           full_name: string
           id: string
           phone: string | null
-          email: string | null
           updated_at: string
         }
         Insert: {
@@ -162,7 +65,6 @@ export type Database = {
           full_name: string
           id: string
           phone?: string | null
-          email?: string | null
           updated_at?: string
         }
         Update: {
@@ -171,7 +73,6 @@ export type Database = {
           full_name?: string
           id?: string
           phone?: string | null
-          email?: string | null
           updated_at?: string
         }
         Relationships: []
