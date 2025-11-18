@@ -29,34 +29,53 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Set up auth state listener
+    // Initialize auth state - check for existing session first
+    const initializeAuth = async () => {
+      try {
+        // Get session from storage/server
+        const { data: { session: existingSession }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Error getting session:', error);
+          setLoading(false);
+          return;
+        }
+
+        if (existingSession) {
+          console.log('Existing session found:', existingSession.user?.id);
+          setSession(existingSession);
+          setUser(existingSession.user);
+          await fetchUserRole(existingSession.user.id);
+        } else {
+          console.log('No existing session');
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        setLoading(false);
+      }
+    };
+
+    // Set up auth state listener for ongoing changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
           // Fetch user role after auth state changes
-          setTimeout(() => {
-            fetchUserRole(session.user.id);
-          }, 0);
+          console.log('Fetching user role for:', session.user.id);
+          await fetchUserRole(session.user.id);
         } else {
           setUserRole(null);
+          setLoading(false);
         }
       }
     );
 
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        fetchUserRole(session.user.id);
-      } else {
-        setLoading(false);
-      }
-    });
+    // Initialize auth on mount
+    initializeAuth();
 
     return () => subscription.unsubscribe();
   }, []);
