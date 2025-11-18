@@ -93,15 +93,27 @@ export default function Auth() {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        // Provide more helpful error messages
+        if (error.message.includes('Invalid login credentials')) {
+          toast.error('Invalid email or password. Please check your credentials or sign up for an account.');
+        } else if (error.message.includes('Email not confirmed')) {
+          toast.error('Please confirm your email address before signing in.');
+        } else {
+          toast.error(error.message);
+        }
+        return;
+      }
 
-      toast.success('Signed in successfully!');
-      navigate('/dashboard');
+      if (data.user) {
+        toast.success('Signed in successfully!');
+        navigate('/dashboard');
+      }
     } catch (error: any) {
       toast.error(error.message || 'Failed to sign in');
     } finally {
